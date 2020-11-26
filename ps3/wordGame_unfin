@@ -33,15 +33,13 @@ def load_words():
     Depending on the size of the word list, this function may
     take a while to finish.
     """
-    
-    print("Loading word list from file...")
+    # I deleted the printing feedback previously in this function to clean up returns.
     # inFile: file
     inFile = open(WORDLIST_FILENAME, 'r')
     # wordlist: list of strings
     wordlist = []
     for line in inFile:
         wordlist.append(line.strip().lower())
-    print("  ", len(wordlist), "words loaded.")
     return wordlist
 
 def get_frequency_dict(sequence):
@@ -122,7 +120,7 @@ def display_hand(hand):
     for letter in hand.keys():
         for j in range(hand[letter]):
             str += letter + " "
-    print str
+    return str
 
 #
 # Make sure you understand how this function works and what it does!
@@ -154,9 +152,8 @@ def deal_hand(n):
         x = random.choice(CONSONANTS)
         hand[x] = hand.get(x, 0) + 1
     
-    print hand
+    return hand
 
-deal_hand(7)
 #
 # Problem #2: Update a hand by removing letters
 #
@@ -186,9 +183,6 @@ def update_hand(hand, word):
             if new_hand[letter] <= 0:
                 new_hand[letter] = 0
     return new_hand
-
-
-update_hand({'a':0, 'q':0, 'l':1, 'm':1, 'u':0, 'i':0}, "evil")
 #
 # Problem #3: Test word validity
 #
@@ -223,6 +217,7 @@ def is_valid_word(word, hand, word_list):
 #
 # Problem #5: Playing a hand
 #
+
 def calculate_handlen(hand):
     """ 
     Returns the length (number of letters) in the current hand.
@@ -230,8 +225,52 @@ def calculate_handlen(hand):
     hand: dictionary (string-> int)
     returns: integer
     """
-    
-    pass  # TO DO... Remove this line when you implement this function
+    length = 0
+    for k in hand:
+        length += hand[k]
+    return length
+
+
+def print_score(word, hand, score):
+    print word + " earned " + str(get_word_score(word, calculate_handlen(hand))) + " points. Total: "\
+          + str(score) + " points."
+
+
+def substitute_hand(hand, letter):
+    """
+    Allow the user to replace all copies of one letter in the hand (chosen by user)
+    with a new letter chosen from the VOWELS and CONSONANTS at random. The new letter
+    should be different from user's choice, and should not be any of the letters
+    already in the hand.
+
+    If user provide a letter not in the hand, the hand should be the same.
+
+    Has no side effects: does not mutate hand.
+
+    For example:
+        substitute_hand({'h':1, 'e':1, 'l':2, 'o':1}, 'l')
+    might return:
+        {'h':1, 'e':1, 'o':1, 'x':2} -> if the new letter is 'x'
+    The new letter should not be 'h', 'e', 'l', or 'o' since those letters were
+    already in the hand.
+
+    hand: dictionary (string -> int)
+    letter: string
+    returns: dictionary (string -> int)
+    """
+
+    new_hand = hand.copy()
+    if letter in hand.keys():
+        available_letters = list(VOWELS + CONSONANTS + "*")
+        for i in new_hand.keys():
+            available_letters.remove(i)
+        x = random.choice(available_letters)
+        new_hand[x] = int(new_hand[letter])
+        del(new_hand[letter])
+    return new_hand
+
+
+substitute_hand({"f": 1, "y": 1, "*": 1, "n": 1}, "f")
 
 def play_hand(hand, word_list):
 
@@ -264,75 +303,48 @@ def play_hand(hand, word_list):
       
     """
     
-    # BEGIN PSEUDOCODE <-- Remove this comment when you implement this function
     # Keep track of the total score
-    
+    score = 0
+    sub = 1
     # As long as there are still letters left in the hand:
-    
-        # Display the hand
-        
-        # Ask user for input
-        
-        # If the input is two exclamation points:
-        
-            # End the game (break out of the loop)
+    while calculate_handlen(hand) > 0:
+        print "Current hand:" + display_hand(hand)
+        while sub > 0:
+            if str(raw_input("Would you like to substitute a letter: ")).lower() == "yes":
+                sub -= 1
+                letter_sub = str(raw_input("Which letter would you like to replace: "))
+                hand = substitute_hand(hand, letter_sub)
+                print "\n Current hand:" + display_hand(hand)
+            else:
+                break
+        word = str(raw_input("Enter word, or !! to indicate that you are finished: "))
+        word = word.lower()
+        if word == "!!":
+            break
+        else:
+            if is_valid_word(word, hand, word_list) is True:
+                score += get_word_score(word,calculate_handlen(hand))
+                print_score(word, hand, score)
+            else:
+                print "That is not a valid word. Please choose another word"
+            hand = update_hand(hand, word)
 
-            
-        # Otherwise (the input is not two exclamation points):
-
-            # If the word is valid:
-
-                # Tell the user how many points the word earned,
-                # and the updated total score
-
-            # Otherwise (the word is not valid):
-                # Reject invalid word (print a message)
-                
-            # update the user's hand by removing the letters of their inputted word
-            
-
-    # Game is over (user entered '!!' or ran out of letters),
-    # so tell user the total score
-
-    # Return the total score as result of function
-
-
+    if calculate_handlen(hand) <= 0:
+        print "Ran out of letters. Total score: " + str(score)
+    if word == "!!":
+        print "Current hand has been forfeited. Total score: " + str(score)
+    print "----------"
+    return score
 
 #
 # Problem #6: Playing a game
-# 
 
-
-#
 # procedure you will use to substitute a letter in a hand
 #
 
-def substitute_hand(hand, letter):
-    """ 
-    Allow the user to replace all copies of one letter in the hand (chosen by user)
-    with a new letter chosen from the VOWELS and CONSONANTS at random. The new letter
-    should be different from user's choice, and should not be any of the letters
-    already in the hand.
 
-    If user provide a letter not in the hand, the hand should be the same.
 
-    Has no side effects: does not mutate hand.
 
-    For example:
-        substitute_hand({'h':1, 'e':1, 'l':2, 'o':1}, 'l')
-    might return:
-        {'h':1, 'e':1, 'o':1, 'x':2} -> if the new letter is 'x'
-    The new letter should not be 'h', 'e', 'l', or 'o' since those letters were
-    already in the hand.
-    
-    hand: dictionary (string -> int)
-    letter: string
-    returns: dictionary (string -> int)
-    """
-    
-    pass  # TO DO... Remove this line when you implement this function
-       
-    
 def play_game(word_list):
     """
     Allow the user to play a series of hands
@@ -345,7 +357,7 @@ def play_game(word_list):
     * For each hand, before playing, ask the user if they want to substitute
       one letter for another. If the user inputs 'yes', prompt them for their
       desired letter. This can only be done once during the game. Once the
-      substitue option is used, the user should not be asked if they want to
+      substitute option is used, the user should not be asked if they want to
       substitute letters in the future.
 
     * For each hand, ask the user if they would like to replay the hand.
@@ -363,16 +375,22 @@ def play_game(word_list):
 
     word_list: list of lowercase strings
     """
-    
-    print("play_game not implemented.") # TO DO... Remove this line when you implement this function
-    
+
+    total_score = 0
+    hand_size = 7
+    replay = 1
+    num_hands = int(raw_input("Enter total number of hands: "))
+    for i in range(num_hands):
+        while replay > 0 and i > 0:
+            if str(raw_input("Would you like to replay the hand?")).lower() == "yes":
+                # We use an empty letter to redo hand
+                play_hand(substitute_hand(deal_hand(hand_size), " "), load_words())
+            total_score += play_hand(hand, word_list)
+        hand = deal_hand(hand_size)
+        play_hand(hand, load_words())
+    print('Total score over all hands: {}'.format(total_score))
 
 
-#
-# Build data structures used for entire session and play game
-# Do not remove the "if __name__ == '__main__':" line - this code is executed
-# when the program is run directly, instead of through an import statement
-#
-# f __name__ == '__main__':
-# word_list = load_words()
-# play_game(word_list)
+if __name__ == '__main__':
+    word_list = load_words()
+    play_game(word_list)
