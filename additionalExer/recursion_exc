@@ -1,0 +1,133 @@
+# Data Structures and Algorithms: Recursion[11 exercises with solution]
+# Nov 27 2020
+
+import sys
+sys.setrecursionlimit(1000000)
+
+# Write a Python program to calculate the sum of a list of numbers.
+
+
+def sum_list(num_list):
+    new_list = num_list[:]
+    if len(new_list) == 1:
+        return new_list[0]
+    else:
+        return new_list[0] + sum_list(new_list[1:])
+
+
+print sum_list([1, 2, 3, 4])
+
+# Write a Python program of recursion list sum.
+
+
+def sum_sum_list(num_list):
+    new_list = num_list[:]
+    tot_sum = 0
+    for item in new_list:
+        if type(item) == list:
+            tot_sum += sum_sum_list(item)
+        else:
+            tot_sum += item
+    return tot_sum
+
+
+# Write a Python program to get the factorial of a non-negative integer.
+
+"""
+def fact(num):
+    if num < 0:
+        print("Invalid input")
+    elif num == (0 or 1):
+        return 1
+    else:
+        return num * fact(num - 1)
+
+
+print fact(3)
+"""
+
+# Write a Python program to solve the Fibonacci sequence using recursion.
+
+
+def fibonacci(nth_term):
+    if nth_term == (0 or 1):
+        return 1
+    else:
+        return fibonacci(nth_term - 1) + fibonacci(nth_term - 2)
+
+
+print fibonacci(2)
+# Recursion limit error, cannot fix on PyCharm IDE at the moment
+
+# Write a Python program to get the sum of digits of a non-negative integer.
+
+
+def sum_digits(num):
+    if num == 0:
+        return 0
+    else:
+        return num % 10 + sum_digits(int(num/10))
+
+
+print sum_digits(395)
+
+# Write a Python program to calculate the sum of the positive integers of n+(n-2)+(n-4)... (until n-x =< 0).
+
+
+def arith_seq_sum(num):
+    if num > 0:
+        return num + arith_seq_sum(num - 2)
+    else:
+        return num
+
+
+print arith_seq_sum(6)
+
+# Write a Python program to calculate the value of 'a' to the power 'b'.
+
+
+def power(a, b):
+    if b == 1:
+        return a
+    if b == -1:
+        return 1/a
+    elif b > 1 or 0 < b < 1 or -1 < b < 0:
+        return a * power(a, b - 1)
+    elif b == 0:
+        return 1
+    else:
+        return (1 / a)**(-b)
+
+
+# Write a Python program to find the greatest common divisor (gcd) of two integers.
+
+
+def gcd_iter(a, b):
+    factor_a = []
+    factor_b = []
+    for i in range(1, a + 1):
+        if a % i == 0:
+            factor_a.append(i)
+    for j in range(1, b + 1):
+        if b % j == 0:
+            factor_b.append(j)
+    if b % a != 0:
+        for f in factor_a:
+            if f not in factor_b:
+                factor_a.remove(f)
+                return factor_a[-1]
+    else:
+        return a
+
+
+def gcd_recur(a, b):
+    low = min(a, b)
+    high = max(a, b)
+    # Once a certain number fully divides the other, we return the "certain number"
+    if low == 0:
+        return high
+    # If it comes down to 1 remainder, cannot be divided out
+    elif low == 1:
+        return 1
+    else:
+        return gcd_recur(low, high % low)
