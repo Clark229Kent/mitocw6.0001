@@ -1,6 +1,10 @@
 # Problem Set 4A
 # Name: Clark
 
+def insert(source_str, insert_str, pos):
+    return source_str[:pos]+insert_str+source_str[pos:]
+
+
 def get_permutations(sequence):
     '''
     Enumerate all permutations of a given string
@@ -21,18 +25,21 @@ def get_permutations(sequence):
     a different order than what is listed here.
     '''
 
-    pass #delete this line and replace with your code here
+    # Base case, unit length string
+    list = []
+    if len(sequence) == 1:
+        list.append(sequence)
+    else:
+        first_letter = sequence[0]
+        rest_seq = sequence[1:]
+        for word in get_permutations(rest_seq):
+            for i in range(len(word) + 1):
+                word = insert(rest_seq, first_letter, i)
+                list.append(word)
+    return list
+
 
 if __name__ == '__main__':
-#    #EXAMPLE
-#    example_input = 'abc'
-#    print('Input:', example_input)
-#    print('Expected Output:', ['abc', 'acb', 'bac', 'bca', 'cab', 'cba'])
-#    print('Actual Output:', get_permutations(example_input))
-    
-#    # Put three example test cases here (for your sanity, limit your inputs
-#    to be three characters or fewer as you will have n! permutations for a 
-#    sequence of length n)
-
-    pass #delete this line and replace with your code here
-
+    print get_permutations("abc")
+    print get_permutations("23456")
+    print get_permutations("pq")
